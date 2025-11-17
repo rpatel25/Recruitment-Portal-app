@@ -29,6 +29,7 @@ export const sub_url = {
   updateQuestionInAssessment: () => `/api/edit_question_in_assessment/`,
   deleteQuestionFromAssessment: () => `/api/delete_question_from_assessment/`,
   getAllAssessmentLinks: () => `/api/get_all_assessment_link/`,
+  sendAssessmentEmail: () => `/api/emails/send/`,
   getReportForAssessment: (assessment_id: string) =>
     `api/generate_report/${assessment_id}`,
   createMeeting: `/api/meeting`,

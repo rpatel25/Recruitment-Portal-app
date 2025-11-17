@@ -1,10 +1,10 @@
-import { sub_url } from '@/util/api';
-import { createApi } from '@reduxjs/toolkit/query/react';
+import { sub_url } from "@/util/api";
+import { createApi } from "@reduxjs/toolkit/query/react";
 import {
   IGetFilterDataByQueryResponse,
   IGetFilterDataResponse,
   IGetFilterDetailsResponse,
-} from '@/types/filter.type';
+} from "@/types/filter.type";
 import {
   ALL_TAGS_TYPE,
   TAG_GET_ALL_MEETINGS,
@@ -23,30 +23,30 @@ import {
   TAG_GET_ALL_ASSESSMENT_LINKS,
   TAG_GET_REPORTS_FOR_ASSESSMENT,
   TAG_GET_USER_STATUS,
-} from './TagTypes';
+} from "./TagTypes";
 import {
   ICreateProjectRequest,
   IGetProjectDetailsResponse,
   IGetProjectsResponse,
   IGetUsersInCompanyResponse,
   IProjectType,
-} from '@/types/project.type';
-import baseQueryWithReauth from './baseQuery';
+} from "@/types/project.type";
+import baseQueryWithReauth from "./baseQuery";
 import {
   IChatHistoyResponse,
   ICreateTranscriptRequest,
   ISessionDetailsResponse,
-} from '@/types/chat.type';
+} from "@/types/chat.type";
 import {
   IAssessment,
   IAssessmentQuestins,
   IAssessmentLink,
-  IAssessmentLinksResponse,
-} from '@/types/assessment.type';
-import { IGetMeetingsResponse } from '@/types/calendar.type';
+  ISendEmailRequest,
+} from "@/types/assessment.type";
+import { IGetMeetingsResponse } from "@/types/calendar.type";
 
 export const ApiRequest = createApi({
-  reducerPath: 'api',
+  reducerPath: "api",
   keepUnusedDataFor: 5,
   tagTypes: ALL_TAGS_TYPE,
   baseQuery: baseQueryWithReauth,
@@ -65,7 +65,7 @@ export const ApiRequest = createApi({
     createFilter: builder.mutation({
       query: (newItem) => ({
         url: sub_url.createFilter,
-        method: 'POST',
+        method: "POST",
         body: newItem,
       }),
     }),
@@ -88,17 +88,17 @@ export const ApiRequest = createApi({
     createProject: builder.mutation({
       query: (newItem: ICreateProjectRequest) => ({
         url: sub_url.createProject,
-        method: 'POST',
+        method: "POST",
         body: newItem,
       }),
     }),
     updateProjectStatus: builder.mutation<
       { id: string },
-      Omit<IProjectType, 'members'>
+      Omit<IProjectType, "members">
     >({
       query: ({ _id, ...body }) => ({
         url: sub_url.updateProjectStatus(_id),
-        method: 'PUT',
+        method: "PUT",
         body: body,
       }),
     }),
@@ -113,14 +113,14 @@ export const ApiRequest = createApi({
     createTranscript: builder.mutation({
       query: (newItem: ICreateTranscriptRequest) => ({
         url: sub_url.createTranscript,
-        method: 'POST',
+        method: "POST",
         body: newItem,
       }),
     }),
     createAssessement: builder.mutation({
       query: (newItem: FormData) => ({
         url: sub_url.createAssessment,
-        method: 'POST',
+        method: "POST",
         body: newItem,
       }),
     }),
@@ -140,7 +140,7 @@ export const ApiRequest = createApi({
     generateAssessmentLink: builder.mutation<IAssessmentLink, string>({
       query: (assessment_id: string) => ({
         url: sub_url.generateAssessmentLink(assessment_id),
-        method: 'GET',
+        method: "GET",
       }),
       invalidatesTags: [TAG_GET_ALL_ASSESSMENT_LINKS],
     }),
@@ -155,7 +155,7 @@ export const ApiRequest = createApi({
     >({
       query: (question) => ({
         url: sub_url.addQuestionToAssessment(),
-        method: 'POST',
+        method: "POST",
         body: question,
       }),
       invalidatesTags: [TAG_GET_QUESTIONS_FOR_ASSESSMENT],
@@ -166,7 +166,7 @@ export const ApiRequest = createApi({
     >({
       query: (question) => ({
         url: sub_url.updateQuestionInAssessment(),
-        method: 'PUT',
+        method: "PUT",
         body: question,
       }),
       invalidatesTags: [TAG_GET_QUESTIONS_FOR_ASSESSMENT],
@@ -177,7 +177,7 @@ export const ApiRequest = createApi({
     >({
       query: (question) => ({
         url: sub_url.deleteQuestionFromAssessment(),
-        method: 'DELETE',
+        method: "DELETE",
         body: question,
       }),
       invalidatesTags: (result, error, arg) => [
@@ -185,14 +185,21 @@ export const ApiRequest = createApi({
         { type: TAG_GET_ASSESSEMENT, id: arg.assessment_id },
       ],
     }),
-    getAllAssessmentLinks: builder.query<IAssessmentLinksResponse, void>({
+    getAllAssessmentLinks: builder.query<IAssessmentLink[], void>({
       query: () => sub_url.getAllAssessmentLinks(),
       providesTags: [TAG_GET_ALL_ASSESSMENT_LINKS],
+    }),
+    sendEmailForAssessment: builder.mutation<void, ISendEmailRequest>({
+      query: (body) => ({
+        url: sub_url.sendAssessmentEmail(),
+        method: "POST",
+        body,
+      }),
     }),
     getReportForAssessment: builder.query<Blob, string>({
       query: (assessment_id: string) => ({
         url: sub_url.getReportForAssessment(assessment_id),
-        method: 'GET',
+        method: "GET",
         responseHandler: async (response: Response) => await response.blob(),
       }),
       providesTags: [TAG_GET_REPORTS_FOR_ASSESSMENT],
@@ -201,7 +208,7 @@ export const ApiRequest = createApi({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       query: (newItem: any) => ({
         url: sub_url.createMeeting,
-        method: 'POST',
+        method: "POST",
         body: newItem,
       }),
     }),
@@ -220,7 +227,7 @@ export const ApiRequest = createApi({
     createCandidateExportedAsCsv: builder.mutation({
       query: (newItem: { session_id: string; candidate_ids: string[] }) => ({
         url: sub_url.createCandidateExportedAsCsv,
-        method: 'POST',
+        method: "POST",
         body: newItem,
       }),
     }),
@@ -251,6 +258,7 @@ export const {
   useUpdateQuestionInAssessmentMutation,
   useDeleteQuestionFromAssessmentMutation,
   useGetAllAssessmentLinksQuery,
+  useSendEmailForAssessmentMutation,
   useLazyGetReportForAssessmentQuery,
   useCreateMeetingMutation,
   useGetAllMeetingsQuery,

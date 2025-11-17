@@ -33,7 +33,7 @@ export interface IAssessment {
   job_description_url: string;
   candidate_name: string;
   skills: string[];
-  status: 'created' | 'taken' | 'evaluated';
+  status: "created" | "taken" | "evaluated";
   questions: IAssessmentQuestins[];
   result: string;
   created_at: string;
@@ -64,12 +64,12 @@ export interface IAssessmentLink {
   };
   candidate: string;
   result: string | null;
-  status: 'created' | 'taken' | 'evaluated';
+  status: "created" | "taken" | "evaluated";
   jd_file: string;
   skills: string[];
   assessment_type: string[];
-  assessment_name: string;
-  assessment_id: string;
+  assessment_name: string; // need to add to api
+  assessment_id: string; // need to add to api
   created_at: string;
 }
 
@@ -77,4 +77,16 @@ export interface IAssessmentLinksResponse {
   status: string;
   message: string;
   data: IAssessmentLink[];
+}
+
+interface IEmailRecipient {
+  email: string;
+  identifier: string;
+}
+
+export interface ISendEmailRequest {
+  to: IEmailRecipient[];
+  subject: string;
+  body: string;
+  link_id?: string;
 }
